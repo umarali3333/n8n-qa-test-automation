@@ -14,7 +14,13 @@ This project automates test case generation and storage using n8n.
 Input → AI (Groq) → Generate Test Cases  
 → Parse → Save to Google Sheets  
 → Create Jira Test Issues
-![Workflow](Test%20case%20generator%20work%20flow.png)
+
+## Workflow Screenshot
+
+> Below is the full n8n automation workflow:
+
+![Workflow](Test%20case%20generator%20work%20flow.png
+
 
 ## Tech Stack
 
