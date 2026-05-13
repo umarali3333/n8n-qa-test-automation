@@ -40,3 +40,5 @@ Input → AI (Groq) → Generate Test Cases
 ---
 
 Built as part of QA automation learning 💡
+## Workflow Screenshot
+![Workflow](Test case generator work flow.png)
