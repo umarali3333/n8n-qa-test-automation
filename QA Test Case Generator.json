@@ -1,0 +1,480 @@
+{
+  "name": "QA Test Case Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=INPUT:\nStory/Bug ID: {{ $json.storyId }}\nTitle: {{ $json.description }}\nDescription: {{ $json.description }}\nType: {{ $json.type }}\nVersion: {{ $json.version }}\nAssignee: {{ $json.assignee }}\n\n---\n\nGenerate 10–15 high-quality test cases using:\n- Positive\n- Negative\n- Boundary Value Analysis (BVA)\n- Equivalence Partitioning (EP)\n- Decision Table (if applicable)\n\nEach test case MUST include:\n\n- storyId (same as input)\n- title (clear test case title)\n- preconditions (what should exist before execution)\n- steps (numbered)\n- testData (input values used in test)\n- expected_result (expected outcome)\n- technique (Positive / Negative / BVA / EP / Decision Table)\n- assigned_to (same as input assignee)\n\nMake sure:\n- No field is left empty\n- Provide meaningful realistic content\n- Steps should be clearly numbered\n\n---\n\nReturn ONLY valid JSON array. No explanation.\n\nFORMAT:\n\n[\n  {\n    \"storyId\": \"\",\n    \"title\": \"\",\n    \"description\": \"\",\n    \"preconditions\": \"\",\n    \"steps\": \"\",\n    \"testData\": {},\n    \"expected_result\": \"\",\n    \"technique\": \"\",\n    \"assigned_to\": \"\"\n  }\n]",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a Senior QA Automation Assistant integrated with Excel and Jira. Your job is to generate comprehensive test cases that can be directly stored in Excel and created in Jira, linked to the same Story/Bug. Use structured QA testing techniques to ensure full functional coverage including edge cases and realistic business scenarios. ALL test cases must use the SAME StoryID and SAME Assignee provided in the input."
+        }
+      },
+      "id": "684c2875-ed60-4caa-9522-925920973d93",
+      "name": "Generate Test Cases",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        464,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "gpt-5"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "1896bc64-d992-404d-ac59-2c1d65364603",
+      "name": "OpenAI GPT-5 Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        480,
+        624
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "jcvydGHRtnWYyQtt",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": {
+          "TestCaseID": "TC_001",
+          "Summary": "Test login with valid credentials",
+          "Description": "Verify that user can login with valid email and password",
+          "Precondition": "User account exists in the system",
+          "Steps": "1. Navigate to login page\n2. Enter valid email\n3. Enter valid password\n4. Click login button",
+          "ExpectedResult": "User is successfully logged in and redirected to dashboard",
+          "Version": "1.0",
+          "StoryID": "PROJ-123",
+          "Assignee": "john.doe",
+          "JiraFields": {
+            "project": {
+              "key": "AUTO"
+            },
+            "summary": "Test login with valid credentials",
+            "description": "Verify that user can login with valid email and password\n\nPrecondition: User account exists in the system\n\nSteps:\n1. Navigate to login page\n2. Enter valid email\n3. Enter valid password\n4. Click login button\n\nExpected Result: User is successfully logged in and redirected to dashboard",
+            "issuetype": {
+              "name": "Test"
+            },
+            "assignee": {
+              "name": "john.doe"
+            },
+            "parent": {
+              "key": "PROJ-123"
+            }
+          }
+        }
+      },
+      "id": "36bbda69-cc26-4aac-9c9a-25c393437bf0",
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        672,
+        624
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "output",
+        "options": {}
+      },
+      "id": "822f67fa-5d7c-4b82-b96a-2d46d0006af8",
+      "name": "Split Test Cases",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        944,
+        736
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "12muzko73D8aR63pms2bmUOReTAv_9n8o5Ira3xNbf3A",
+          "mode": "list",
+          "cachedResultName": "Test cases",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/12muzko73D8aR63pms2bmUOReTAv_9n8o5Ira3xNbf3A/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1019447095,
+          "mode": "list",
+          "cachedResultName": "Sheet2",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/12muzko73D8aR63pms2bmUOReTAv_9n8o5Ira3xNbf3A/edit#gid=1019447095"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "TestCaseID": "={{ \"TC-\" + ($itemIndex + 1).toString().padStart(2, '0') }} ``",
+            "Title": "={{ $json.title }}",
+            "Description ": "={{ $json.description }}\n",
+            "Precondition": "={{ $json.preconditions || \"Not provided\" }}",
+            "Steps": "={{ $json.steps }}",
+            "TestData": "={{ $json.testData ? JSON.stringify($json.testData) : \"N/A\" }}",
+            "ExpectedResult": "={{ $json.expected_result }}",
+            "TestType": "={{ $json.technique || \"Manual\" }}",
+            "Priority": "={{ $json.priority || \"Medium\" }}",
+            "Version": "={{ $json.version || \"v1.0\" }}",
+            "StoryID": "={{ $json.storyId }}",
+            "Assignee": "={{ $json.assigned_to || \"Unassigned\" }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "TestCaseID",
+              "displayName": "TestCaseID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Description ",
+              "displayName": "Description ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Precondition",
+              "displayName": "Precondition",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Steps",
+              "displayName": "Steps",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "TestData",
+              "displayName": "TestData",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ExpectedResult",
+              "displayName": "ExpectedResult",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "TestType",
+              "displayName": "TestType",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Version",
+              "displayName": "Version",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "StoryID",
+              "displayName": "StoryID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Assignee",
+              "displayName": "Assignee",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "8cb520bf-f8e7-41fc-9dee-24632c7ad4ed",
+      "name": "Save to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1152,
+        288
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "BlP50LPyP34taRlK",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10000",
+          "mode": "list",
+          "cachedResultName": "N8NAI"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10005",
+          "mode": "list",
+          "cachedResultName": "Subtask"
+        },
+        "summary": "={{$json.title}}",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "712020:428244c0-a5d0-4d85-91b6-a226c3d8e38d",
+            "mode": "list",
+            "cachedResultName": "Umar"
+          },
+          "description": "=Description:\n{{ $json.description }}\nPreconditions:\n{{ $json.preconditions || \"Not provided\" }}\n\n---\n\nSteps:\n{{ $json.steps }}\n\n---\n\nTest Data:\n{{ $json.testData ? JSON.stringify($json.testData, null, 2) : \"Not provided\" }}\n\n---\n\nExpected Result:\n{{ $json.expected_result }}\n\n---\n\nTechnique:\n{{ $json.technique || \"Not specified\" }}",
+          "parentIssueKey": "={{$json.storyId}}"
+        }
+      },
+      "id": "2fa129af-4a42-4e59-8eda-afd21956d316",
+      "name": "Create Jira Test Issue",
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        496
+      ],
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "hRdXDBNufmHp6uEz",
+          "name": "Jira SW Cloud account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "public": true,
+        "availableInChat": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        1216,
+        736
+      ],
+      "id": "4a30d4f7-f319-4aa8-82f6-b81465ef15f0",
+      "name": "When chat message received",
+      "webhookId": "36691b5d-768a-48e3-85dc-0e782d2fffc6"
+    },
+    {
+      "parameters": {},
+      "id": "d4dee600-a7fa-4eb9-9547-76804603b793",
+      "name": "When clicking \"Test workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        48,
+        272
+      ],
+      "alwaysOutputData": true,
+      "executeOnce": true,
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"storyId\": \"N8NAI-25\",\n  \"description\": \"Critical payment issue BAU\",\n  \"type\": \"Story\",\n  \"version\": \"1.0\",\n  \"assignee\": \"Umar\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        256,
+        272
+      ],
+      "id": "3184fd23-2ab5-4353-ab1c-a3ce5583a7bc",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "const parsed = JSON.parse(items[0].json.output);\n\nreturn parsed.map(item => ({\n  json: item\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        832,
+        320
+      ],
+      "id": "ede5ba2e-85b1-4b6b-ac97-f645d11ba60d",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-safeguard-20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        192,
+        624
+      ],
+      "id": "2ca1d290-59a8-4d45-94bf-0fb6767013d7",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "ayuQq7u49ZACsQPd",
+          "name": "Groq account 3"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Generate Test Cases": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI GPT-5 Model": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        []
+      ]
+    },
+    "Split Test Cases": {
+      "main": [
+        []
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        []
+      ]
+    },
+    "When clicking \"Test workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Generate Test Cases",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Create Jira Test Issue",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Save to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate Test Cases",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "ab7d93b5-4de6-46ce-b5f9-d18cc9d99f1e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "94c79b07a33e5626da20ad34da8db219e16f5cf0d76dbd9cfa01a332fcc8523f"
+  },
+  "id": "yqPY6jqbcM2ZzWsY",
+  "tags": []
+}
