@@ -19,7 +19,7 @@ Input → AI (Groq) → Generate Test Cases
 
 > Below is the full n8n automation workflow:
 
-![Workflow](Test%20case%20generator%20work%20flow.png
+![Workflow](workflow.png)
 
 
 ## Tech Stack
